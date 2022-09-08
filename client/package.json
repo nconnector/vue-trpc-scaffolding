@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@trpc/client": "^9.27.2",
     "vue": "^3.2.37"
   },
   "devDependencies": {
