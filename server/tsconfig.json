@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "typeRoots": [
+      "./node_modules",
+      "./node_modules/@types"
+    ]
+  }
+}

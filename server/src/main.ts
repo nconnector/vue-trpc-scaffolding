@@ -5,6 +5,8 @@ import * as trpc from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
 
+require("dotenv").config();
+
 const app: Application = express();
 app.use(express.json());
 app.use(cors({}));
@@ -14,27 +16,35 @@ const createContext = ({
   res,
 }: trpcExpress.CreateExpressContextOptions) => ({});
 
-//
-let counter = 0;
-const incrementCounter = (val: number) => {
-  counter += val;
+// test state
+let counter: number = 0;
+const counterIncrement = (num: number = 1) => {
+  return (counter += num);
+};
+const counterReset = () => {
+  counter = 0;
   return counter;
 };
-//
 
-const apiRouter = trpc
+// test router
+const apiRouter = trpc //https://trpc.io/docs/v9/
   .router()
-  .query("health-check", {
+  .query("counter", {
     input: z.undefined(),
-    async resolve(req) {
-      return "200 ALL GOOD!";
+    async resolve() {
+      return counter;
     },
   })
-  .mutation("increment-counter", {
-    input: z.union([z.object({ incrementBy: z.number() }), z.undefined()]),
+  .mutation("counterIncrement", {
+    input: z.optional(z.number().int().nonnegative()),
     async resolve(req) {
-      const incrementBy = req.input?.incrementBy || 1;
-      return incrementCounter(incrementBy);
+      return counterIncrement(req.input);
+    },
+  })
+  .mutation("counterReset", {
+    input: z.undefined(),
+    async resolve(req) {
+      return counterReset();
     },
   });
 
@@ -46,6 +56,9 @@ app.use(
   })
 );
 
-app.listen(5001, () => {
-  console.log("Server listening on :5001");
+const API_PORT = process.env.API_PORT;
+app.listen(API_PORT, () => {
+  console.log("Server listening on :" + API_PORT);
 });
+
+export type ApiRouter = typeof apiRouter;
